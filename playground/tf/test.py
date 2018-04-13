@@ -49,11 +49,11 @@ class DNN:
 
     def train_predict(self, input_data):
         output = self.output
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=output, labels=self.y))
+        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=output, labels=self.y))
         optimizer = tf.train.AdamOptimizer().minimize(loss)
-        hm_epochs = 1
+        hm_epochs = 10
         with tf.Session() as sess:
-            # sess.run(tf.global_variables_initializer())
+            sess.run(tf.global_variables_initializer())
             for epoch in range(hm_epochs):
                 epoch_loss = 0
                 for _ in range(int(input_data.train.num_examples / self.batch_size)):
@@ -62,8 +62,8 @@ class DNN:
                     epoch_loss += c
                 print('Epoch', epoch, 'loss', epoch_loss)
 
-            correct = tf.equal(tf.arg_max(output, 1), tf.arg_max(self.y, 1))
-            accuracy = tf.reduce_mean(tf.cast(correct),'float')
+            correct = tf.equal(tf.argmax(output, 1), tf.argmax(self.y, 1))
+            accuracy = tf.reduce_mean(tf.cast(correct,'float'))
             print('Accuracy', accuracy.eval({self.x: input_data.test.images, self.y: input_data.test.labels}))
 
 
@@ -75,7 +75,6 @@ def main():
     data = Data().mnist
     m = DNN()
     m.train_predict(data)
-    print(data)
 
 
 if __name__ == '__main__':
