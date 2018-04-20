@@ -1,0 +1,52 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 20 14:49:09 2018
+
+@author: agt
+"""
+
+from keras.layers import Dense
+from keras.models import Sequential
+
+class Data:
+    def __init__(self):
+        self.mnist = self.get_data()
+
+    def get_data(self):
+        mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+        return mnist
+    
+# Data
+data = Data().mnist
+X_train = data.train.images
+y_train = data.train.labels
+X_test = data.test.images
+y_test = data.test.labels
+
+# Sequential model
+model = Sequential()
+model.add(Dense(500,input_dim=784,activation='relu', kernel_initializer = 'random_normal'))
+model.add(Dense(500,activation = 'relu', kernel_initializer = 'random_normal'))
+model.add(Dense(500,activation = 'relu', kernel_initializer = 'random_normal'))
+model.add(Dense(10, activation = 'softmax',  kernel_initializer = 'random_normal'))
+model.compile(loss='categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
+
+model.fit(X_train, y_train, verbose=1, epochs = 10, batch_size=100)
+
+model.evaluate(X_test, y_test,batch_size=1000)
+result = model.predict_classes(X_test)
+true_result = np.argmax(y_test,1)
+notsame = [(i,j) for (i,j) in zip(result, true_result) if i!=j]
+
+#accuracy for sequence net is 0.94
+
+## RFC only reaches 0.91
+#from sklearn.ensemble import RandomForestClassifier, accuracy_score
+#rfc = RandomForestClassifier(n_estimators=500, max_depth=100, max_features=300,n_jobs=-1)
+#
+#rfc.fit(X_train, y_train)
+#
+#from sklearn.metrics import classification_report, accuracy_score
+#print classification_report(y_test, rfc.predict(X_test))
+#print accuracy_score(y_test, rfc.predict(X_test))
